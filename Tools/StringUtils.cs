@@ -71,7 +71,7 @@ namespace Tools.String
                     }
                 }
 
-                return sb.ToString().ToUpper();
+                return sb.ToString();
             }
             catch (Exception)
             {

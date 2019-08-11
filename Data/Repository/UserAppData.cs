@@ -30,11 +30,13 @@ namespace Data.Repository
             try
             {
                 int count = 0;
-                if(user.UserId == Guid.Empty)
+                if (user.UserId == Guid.Empty)
                     count = Count("WHERE UserName =@user", new { user = user.UserName }, transaction: transaction);
                 else
-                    count = Count("WHERE UserName = @user AND UserId <> @id", new {
-                        user = user.UserName, id = user.UserId
+                    count = Count("WHERE UserName = @user AND UserId <> @id", new
+                    {
+                        user = user.UserName,
+                        id = user.UserId
                     }, transaction: transaction);
 
                 return false;

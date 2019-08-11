@@ -39,7 +39,10 @@ namespace Services
         {
             try
             {
-                return _userAppData.UserFindByUser(userName);
+                var user = _userAppData.UserFindByUser(userName);
+                if (user != null)
+                    user.UserPw = string.Empty;
+                return user;
             }
             catch (Exception)
             {
@@ -56,7 +59,11 @@ namespace Services
         {
             try
             {
-                return _userAppData.UserFindByDocument(document);
+                var user = _userAppData.UserFindByDocument(document);
+                if (user != null)
+                    user.UserPw = string.Empty;
+
+                return user;
             }
             catch (Exception)
             {
@@ -73,7 +80,11 @@ namespace Services
         {
             try
             {
-                return _userAppData.UserFindByEmail(email);
+                var user = _userAppData.UserFindByEmail(email);
+                if (user != null)
+                    user.UserPw = string.Empty;
+
+                return user;
             }
             catch (Exception)
             {
@@ -113,6 +124,12 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Actualiza un usuario por id en la base de datos
+        /// </summary>
+        /// <param name="user">usuario a modificar</param>
+        /// <param name="session">sesion del usuario</param>
+        /// <returns>UserApp</returns>
         public UserApp UserAppUpdate(UserApp user, UserSession session)
         {
             try
@@ -152,7 +169,11 @@ namespace Services
         {
             try
             {
-                return _userAppData.Get(guid);
+                var user = _userAppData.Get(guid);
+                if (user != null)
+                    user.UserPw = string.Empty;
+
+                return user;
             }
             catch (Exception)
             {

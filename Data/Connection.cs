@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using Tools.String;
 
 namespace Data
 {
@@ -10,11 +9,6 @@ namespace Data
     /// </summary>
     public class Connection : IDisposable, IConnection
     {
-        /// <summary>
-        /// Cadena de conexion por default
-        /// </summary>
-        private readonly string _connectionString = StringUtils.ReadKeyConfig("DefaultConnections");
-
         /// <summary>
         /// Establece el objeto de conexion
         /// </summary>
@@ -26,17 +20,8 @@ namespace Data
         /// </summary>
         public Connection()
         {
-            DBConnection = new SqlConnection(_connectionString);
-        }
-
-        /// <summary>
-        /// Establece una conexion sql a partir de la llave de conexion en el web config
-        /// </summary>
-        /// <param name="keyConnections"></param>
-        public Connection(string keyConnections)
-        {
-            string connectionString = StringUtils.ReadConnectionsConfig(keyConnections);
-            DBConnection = new SqlConnection(connectionString);
+            var configuration = new AppConfiguration();
+            DBConnection = new SqlConnection(configuration.ConnectionString);
         }
 
         /// <summary>

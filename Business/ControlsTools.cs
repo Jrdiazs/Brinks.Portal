@@ -1,7 +1,5 @@
 ﻿using Entity;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Services.Controls
 {
@@ -16,7 +14,7 @@ namespace Services.Controls
         /// <param name="control">control</param>
         /// <param name="values">valores del mensaje</param>
         /// <returns>Exception</returns>
-        public static Exception CreateException(this ControlsLanguage control, params object [] values)
+        public static Exception CreateException(this ControlsLanguage control, params object[] values)
         {
             try
             {
