@@ -60,5 +60,8 @@ namespace Entity
 
         [Column("UserUpdateId")]
         public Guid? UserUpdateId { get; set; }
+
+        [NotMapped]
+        public Third Third { get; set; }
     }
 }

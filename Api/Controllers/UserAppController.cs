@@ -9,7 +9,9 @@ namespace Api.Controllers
     public class UserAppController : ControllerBase
     {
         private readonly IUserServices _userServices;
-        public UserAppController(IUserServices userServices) {
+
+        public UserAppController(IUserServices userServices)
+        {
             _userServices = userServices;
         }
 

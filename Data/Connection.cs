@@ -10,6 +10,11 @@ namespace Data
     public class Connection : IDisposable, IConnection
     {
         /// <summary>
+        /// Configuracion de sitio
+        /// </summary>
+        private readonly IAppConfiguration _config;
+
+        /// <summary>
         /// Establece el objeto de conexion
         /// </summary>
         /// <param name="dbConnection">objeto de conexion</param>
@@ -20,8 +25,8 @@ namespace Data
         /// </summary>
         public Connection()
         {
-            var configuration = new AppConfiguration();
-            DBConnection = new SqlConnection(configuration.ConnectionString);
+            _config = new AppConfiguration();
+            DBConnection = new SqlConnection(_config.GetConnectionString("DefaultConnections"));
         }
 
         /// <summary>

@@ -42,5 +42,11 @@ namespace Entity
 
         [Column("UserUpdateId")]
         public Guid? UserUpdateId { get; set; }
+
+        [NotMapped]
+        public LanguageApp Language { get; set; }
+
+        [NotMapped]
+        public FormsApp Forms { get; set; }
     }
 }

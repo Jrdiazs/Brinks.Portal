@@ -1,4 +1,4 @@
-﻿namespace Entity
+﻿namespace Entity.Request
 {
     /// <summary>
     /// Modelo para autenticar
