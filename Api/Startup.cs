@@ -29,6 +29,7 @@ namespace Api
             services.AddScoped<IControlsLanguageData, ControlsLanguageData>();
             services.AddScoped<IParametersData, ParametersData>();
             services.AddScoped<IPolicyGlobalAppData, PolicyGlobalAppData>();
+            services.AddScoped<ISessionData, SessionData>();
 
             services.AddScoped<IUserServices, UserServices>();
             services.AddScoped<ILoginServices, LoginServices>();

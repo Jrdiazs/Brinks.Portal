@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace Data
 {
@@ -43,12 +44,16 @@ namespace Data
             {
                 if (DBConnection.State != ConnectionState.Open)
                     DBConnection.Open();
+
+                
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
+        
 
         /// <summary>
         /// Cierra la conexion actual

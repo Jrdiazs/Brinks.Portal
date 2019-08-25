@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services;
 using System;
+using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
@@ -22,11 +23,11 @@ namespace Api.Controllers
         /// <returns>UserApp</returns>
         [HttpGet]
         [Route("UserAppFindById")]
-        public IActionResult UserAppFindById([FromQuery] Guid id)
+        public async Task<IActionResult> UserAppFindById([FromQuery] Guid id)
         {
             try
             {
-                var user = _userServices.UsertFinById(id);
+                var user = await _userServices.UsertFinById(id);
                 return Ok(user);
             }
             catch (Exception)

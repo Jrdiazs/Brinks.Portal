@@ -28,5 +28,10 @@ namespace Entity
         /// Id lenguaje Usuario
         /// </summary>
         public int LanguageId { get; set; }
+
+        /// <summary>
+        /// Id de session actual
+        /// </summary>
+        public Guid SesionId { get; set; }
     }
 }

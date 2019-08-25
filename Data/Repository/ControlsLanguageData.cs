@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Data.Repository
 {
@@ -26,16 +27,18 @@ namespace Data.Repository
         /// <param name="languageId">id de lenguaje</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>ControlsLanguage</returns>
-        public ControlsLanguage ControlFindByKey(string name, int formId, int languageId, IDbTransaction transaction = null)
+        public async Task<ControlsLanguage> ControlFindByKey(string name, int formId, int languageId, IDbTransaction transaction = null)
         {
             try
             {
-                return GetList("WHERE ControlName = @controlName AND FormId= @form AND LanguageId = @language", new
+                var control = await GetListAsync("WHERE ControlName = @controlName AND FormId= @form AND LanguageId = @language", new
                 {
                     controlName = name,
                     form = formId,
                     language = languageId
-                }, transaction: transaction).FirstOrDefault();
+                }, transaction: transaction);
+
+                return control.FirstOrDefault();
             }
             catch (Exception)
             {
@@ -57,6 +60,6 @@ namespace Data.Repository
         /// <param name="languageId">id de lenguaje</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>ControlsLanguage</returns>
-        ControlsLanguage ControlFindByKey(string name, int formId, int languageId, IDbTransaction transaction = null);
+        Task<ControlsLanguage> ControlFindByKey(string name, int formId, int languageId, IDbTransaction transaction = null);
     }
 }

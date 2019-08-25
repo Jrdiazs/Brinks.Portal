@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using System;
+using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
@@ -18,11 +19,11 @@ namespace Api.Controllers
 
         [HttpPost]
         [Route("GetAutenticate")]
-        public IActionResult UserAppFindById([FromBody] Login login)
+        public async Task<IActionResult> UserAppFindById([FromBody] Login login)
         {
             try
             {
-                var aut = _loginServices.AutenticateUser(login);
+                var aut = await _loginServices.AsyncAutenticateUser(login);
                 return Ok(aut);
             }
             catch (Exception)

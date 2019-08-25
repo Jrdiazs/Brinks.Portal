@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Data.Repository
 {
@@ -24,11 +25,12 @@ namespace Data.Repository
         /// <param name="nameKey">nombre de la llave</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>ParametersApp</returns>
-        public ParametersApp ParameterFindByKey(string nameKey, IDbTransaction transaction = null)
+        public async Task<ParametersApp> ParameterFindByKey(string nameKey, IDbTransaction transaction = null)
         {
             try
             {
-                return GetList("WHERE ParameterKey= @ParameterKey", new { ParameterKey = nameKey }, transaction).FirstOrDefault();
+                var parameter = await GetListAsync("WHERE ParameterKey= @ParameterKey", new { ParameterKey = nameKey }, transaction);
+                return parameter.FirstOrDefault();
             }
             catch (Exception)
             {
@@ -43,13 +45,13 @@ namespace Data.Repository
         /// <param name="nameKey">nombre de la llave del parametro</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>T</returns>
-        public T ValueFindByKey<T>(string nameKey, IDbTransaction transaction = null)
+        public async Task<T> ValueFindByKey<T>(string nameKey, IDbTransaction transaction = null)
         {
             try
             {
                 T value = default(T);
 
-                var parameter = ParameterFindByKey(nameKey);
+                var parameter = await ParameterFindByKey(nameKey);
                 if (null == parameter) return value;
 
                 if (typeof(T) == typeof(int) || typeof(T) == typeof(int?))
@@ -106,7 +108,7 @@ namespace Data.Repository
         /// <param name="nameKey">nombre de la llave</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>ParametersApp</returns>
-        ParametersApp ParameterFindByKey(string nameKey, IDbTransaction transaction = null);
+        Task<ParametersApp> ParameterFindByKey(string nameKey, IDbTransaction transaction = null);
 
         /// <summary>
         /// Obtiene el valor especifico de un parametro segun el tipo de dato T
@@ -115,6 +117,6 @@ namespace Data.Repository
         /// <param name="nameKey">nombre de la llave del parametro</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>T</returns>
-        T ValueFindByKey<T>(string nameKey, IDbTransaction transaction = null);
+        Task<T> ValueFindByKey<T>(string nameKey, IDbTransaction transaction = null);
     }
 }

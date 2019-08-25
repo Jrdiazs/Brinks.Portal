@@ -2,6 +2,8 @@
 using Entity;
 using Entity.Request;
 using System;
+using System.Threading.Tasks;
+using System.Transactions;
 using Tools.String;
 
 namespace Services
@@ -27,16 +29,23 @@ namespace Services
         private readonly IPolicyGlobalAppData _policyGlobalAppData;
 
         /// <summary>
+        /// Accesi a datos a la tabla de sesiones
+        /// </summary>
+        private readonly ISessionData _sessionData;
+
+        /// <summary>
         /// Instancia una clase de negocio para la tabla User
         /// </summary>
         /// <param name="userAppData">repositorios de datos para usuarios</param>
         /// <param name="parametersData">repositorio de datos para parametros</param>
         /// <param name="policyGlobalAppData">repositorios de datos para las politicas globales</param>
-        public LoginServices(IUserAppData userAppData, IParametersData parametersData, IPolicyGlobalAppData policyGlobalAppData)
+        /// <param name="sessionData">repositorios para las sesiones</param>
+        public LoginServices(IUserAppData userAppData, IParametersData parametersData, IPolicyGlobalAppData policyGlobalAppData, ISessionData sessionData)
         {
             _userAppData = userAppData;
             _parametersData = parametersData;
             _policyGlobalAppData = policyGlobalAppData;
+            _sessionData = sessionData;
         }
 
         /// <summary>
@@ -44,7 +53,7 @@ namespace Services
         /// </summary>
         /// <param name="login">login de usuario</param>
         /// <returns>modelo de autenticacion</returns>
-        public SessionAuthentication AutenticateUser(Login login)
+        public async Task<SessionAuthentication> AsyncAutenticateUser(Login login)
         {
             try
             {
@@ -57,12 +66,10 @@ namespace Services
                 var autenticate = new SessionAuthentication()
                 {
                     IsAuthenticate = false,
-                    TypeAutentication = TypeAutentication.Default,
-                    Policy = null,
-                    UserApp = null
+                    TypeAutentication = TypeAutentication.Default
                 };
 
-                userApp = _userAppData.UserFindByUser(login.UserName);
+                userApp = await _userAppData.UserFindByUser(login.UserName);
 
                 if (null == userApp)
                 {
@@ -71,13 +78,13 @@ namespace Services
                 }
 
                 policy = !userApp.PolicyId.HasValue ?
-                    _policyGlobalAppData.PolicyGetGlobal() :
-                    _policyGlobalAppData.PolicyFindById(userApp.PolicyId.Value);
+                   await _policyGlobalAppData.PolicyGetGlobal() :
+                  await _policyGlobalAppData.PolicyFindById(userApp.PolicyId.Value);
 
                 pwDecode = login.Password.Base64Decode();
                 isAutenticate = userApp.UserPw == pwDecode.SHA1();
-                stateInactiveUser = _parametersData.ValueFindByKey<int>("StateInactiveUser");
-                stateLockedUser = _parametersData.ValueFindByKey<int>("StateLockedUser");
+                stateInactiveUser = await _parametersData.ValueFindByKey<int>("StateInactiveUser");
+                stateLockedUser = await _parametersData.ValueFindByKey<int>("StateLockedUser");
 
                 if (0 != stateInactiveUser && userApp.UserStateId == stateInactiveUser)
                 {
@@ -108,7 +115,7 @@ namespace Services
                         }
                     }
 
-                    _userAppData.Update(userApp);
+                    await _userAppData.UpdateAsync(userApp);
                     autenticate.TypeAutentication = TypeAutentication.NotFound;
                 }
                 else
@@ -127,11 +134,26 @@ namespace Services
                     userApp.UserLastDateEntry = DateTime.Now;
                     userApp.PolicyId = !userApp.PolicyId.HasValue ? policy.PolicyId : userApp.PolicyId;
 
-                    _userAppData.Update(userApp);
+                    var sessionId = Guid.NewGuid();
+                    using (var tran = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                    {
+                        await _userAppData.UpdateAsync(userApp);
+                        await _sessionData.InsertKeyAsync<Guid>(new CurrentSession()
+                        {
+                            Active = true,
+                            CreationDate = DateTime.Now,
+                            SessionId = sessionId,
+                            UserId = userApp.UserId
+                        });
 
-                    userApp.UserPw = string.Empty;
-                    autenticate.UserApp = userApp;
-                    autenticate.Policy = policy;
+                        tran.Complete();
+                    }
+
+                   
+
+                    autenticate.SessionId = sessionId;
+                    autenticate.UserId = userApp.UserId;
+                    autenticate.PolicyId = policy.PolicyId;
                     autenticate.IsAuthenticate = true;
                 }
 
@@ -162,6 +184,9 @@ namespace Services
 
                     if (null != _policyGlobalAppData)
                         _policyGlobalAppData.Dispose();
+
+                    if (null != _sessionData)
+                        _sessionData.Dispose();
                 }
 
                 // TODO: libere los recursos no administrados (objetos no administrados) y reemplace el siguiente finalizador.
@@ -199,6 +224,6 @@ namespace Services
         /// </summary>
         /// <param name="login">login de usuario</param>
         /// <returns>modelo de autenticacion</returns>
-        SessionAuthentication AutenticateUser(Login login);
+        Task<SessionAuthentication> AsyncAutenticateUser(Login login);
     }
 }

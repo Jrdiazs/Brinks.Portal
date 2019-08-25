@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Data.Repository
 {
@@ -25,15 +26,15 @@ namespace Data.Repository
         /// <param name="transaction">transaccion sql server</param>
         /// <returns></returns>
 
-        public bool ExistUserByUserName(UserApp user, IDbTransaction transaction = null)
+        public async Task<bool> ExistUserByUserName(UserApp user, IDbTransaction transaction = null)
         {
             try
             {
                 int count = 0;
                 if (user.UserId == Guid.Empty)
-                    count = Count("WHERE UserName =@user", new { user = user.UserName }, transaction: transaction);
+                    count = await CountAsync("WHERE UserName =@user", new { user = user.UserName }, transaction: transaction);
                 else
-                    count = Count("WHERE UserName = @user AND UserId <> @id", new
+                    count = await CountAsync("WHERE UserName = @user AND UserId <> @id", new
                     {
                         user = user.UserName,
                         id = user.UserId
@@ -53,11 +54,11 @@ namespace Data.Repository
         /// <param name="userName">nombre de usuario</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>UserApp</returns>
-        public UserApp UserFindByUser(string userName, IDbTransaction transaction = null)
+        public async Task<UserApp> UserFindByUser(string userName, IDbTransaction transaction = null)
         {
             try
             {
-                var user = GetList("WHERE UserName = @UserName", new { UserName = userName }, transaction: transaction);
+                var user = await GetListAsync("WHERE UserName = @UserName", new { UserName = userName }, transaction: transaction);
                 return user.FirstOrDefault();
             }
             catch (Exception)
@@ -72,11 +73,11 @@ namespace Data.Repository
         /// <param name="document">numero de documento</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>UserApp</returns>
-        public UserApp UserFindByDocument(string document, IDbTransaction transaction = null)
+        public async Task<UserApp> UserFindByDocument(string document, IDbTransaction transaction = null)
         {
             try
             {
-                var user = GetList("WHERE UserDocument = @UserDocument", new { UserDocument = document }, transaction: transaction);
+                var user = await GetListAsync("WHERE UserDocument = @UserDocument", new { UserDocument = document }, transaction: transaction);
                 return user.FirstOrDefault();
             }
             catch (Exception)
@@ -91,11 +92,11 @@ namespace Data.Repository
         /// <param name="email">correo electronico</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>UserApp</returns>
-        public UserApp UserFindByEmail(string email, IDbTransaction transaction = null)
+        public async Task<UserApp> UserFindByEmail(string email, IDbTransaction transaction = null)
         {
             try
             {
-                var user = GetList("WHERE UserEmail = @UserEmail", new { UserEmail = email }, transaction: transaction);
+                var user = await GetListAsync("WHERE UserEmail = @UserEmail", new { UserEmail = email }, transaction: transaction);
                 return user.FirstOrDefault();
             }
             catch (Exception)
@@ -116,7 +117,7 @@ namespace Data.Repository
         /// <param name="userName">nombre de usuario</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>UserApp</returns>
-        UserApp UserFindByUser(string userName, IDbTransaction transaction = null);
+        Task<UserApp> UserFindByUser(string userName, IDbTransaction transaction = null);
 
         /// <summary>
         /// Consulta un usuario en la base de datos por numero de documento
@@ -124,7 +125,7 @@ namespace Data.Repository
         /// <param name="document">numero de documento</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>UserApp</returns>
-        UserApp UserFindByDocument(string document, IDbTransaction transaction = null);
+        Task<UserApp> UserFindByDocument(string document, IDbTransaction transaction = null);
 
         /// <summary>
         /// Consulta un usuario en la base de datos por correo electronico
@@ -132,7 +133,7 @@ namespace Data.Repository
         /// <param name="email">correo electronico</param>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>UserApp</returns>
-        UserApp UserFindByEmail(string email, IDbTransaction transaction = null);
+        Task<UserApp> UserFindByEmail(string email, IDbTransaction transaction = null);
 
         /// <summary>
         /// Verifica si existe un usuario por nombre de usuario
@@ -141,6 +142,6 @@ namespace Data.Repository
         /// <param name="transaction">transaccion sql server</param>
         /// <returns></returns>
 
-        bool ExistUserByUserName(UserApp user, IDbTransaction transaction = null);
+        Task<bool> ExistUserByUserName(UserApp user, IDbTransaction transaction = null);
     }
 }

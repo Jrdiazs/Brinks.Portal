@@ -1,4 +1,6 @@
-﻿namespace Entity
+﻿using System;
+
+namespace Entity
 {
     /// <summary>
     /// Modelo que identifica si la autenticacion fue exitosa
@@ -13,16 +15,21 @@
         /// <summary>
         /// Usuario de autenticacion
         /// </summary>
-        public UserApp UserApp { get; set; }
+        public Guid UserId { get; set; }
 
         /// <summary>
         /// Politica de inicio de sesion
         /// </summary>
-        public PolicyView Policy { get; set; }
+        public Guid PolicyId { get; set; }
 
         /// <summary>
         /// Tipo de autenticacion
         /// </summary>
         public TypeAutentication TypeAutentication { get; set; } = TypeAutentication.Default;
+
+        /// <summary>
+        /// Session Id
+        /// </summary>
+        public Guid SessionId { get; set; }
     }
 }

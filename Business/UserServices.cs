@@ -2,6 +2,7 @@
 using Entity;
 using Services.Controls;
 using System;
+using System.Threading.Tasks;
 
 namespace Services
 {
@@ -35,11 +36,11 @@ namespace Services
         /// </summary>
         /// <param name="userName">nombre de usuario</param>
         /// <returns>UserApp</returns>
-        public UserApp UserFindByUser(string userName)
+        public async Task<UserApp> UserFindByUser(string userName)
         {
             try
             {
-                var user = _userAppData.UserFindByUser(userName);
+                var user = await _userAppData.UserFindByUser(userName);
                 if (user != null)
                     user.UserPw = string.Empty;
                 return user;
@@ -55,11 +56,11 @@ namespace Services
         /// </summary>
         /// <param name="document">numero de documento</param>
         /// <returns>UserApp</returns>
-        public UserApp UserFindByDocument(string document)
+        public async Task<UserApp> UserFindByDocument(string document)
         {
             try
             {
-                var user = _userAppData.UserFindByDocument(document);
+                var user = await _userAppData.UserFindByDocument(document);
                 if (user != null)
                     user.UserPw = string.Empty;
 
@@ -76,11 +77,11 @@ namespace Services
         /// </summary>
         /// <param name="email">correo electronico</param>
         /// <returns>UserApp</returns>
-        public UserApp UserFindByEmail(string email)
+        public async Task<UserApp> UserFindByEmail(string email)
         {
             try
             {
-                var user = _userAppData.UserFindByEmail(email);
+                var user = await _userAppData.UserFindByEmail(email);
                 if (user != null)
                     user.UserPw = string.Empty;
 
@@ -98,13 +99,13 @@ namespace Services
         /// <param name="user">usuario a crear</param>
         /// <param name="session">sesion del usuario</param>
         /// <returns>UserApp</returns>
-        public UserApp UserAppInsert(UserApp user, UserSession session)
+        public async Task<UserApp> UserAppInsert(UserApp user, UserSession session)
         {
             try
             {
-                if (_userAppData.ExistUserByUserName(user))
+                if (await _userAppData.ExistUserByUserName(user))
                 {
-                    var control = _controlsLanguageData.ControlFindByKey("UserExistForName", 2, session.LanguageId);
+                    var control = await _controlsLanguageData.ControlFindByKey("UserExistForName", 2, session.LanguageId);
                     throw control.CreateException(user.UserName);
                 }
 
@@ -113,7 +114,7 @@ namespace Services
                 user.UpdateDate = null;
                 user.UserUpdateId = null;
 
-                Guid id = _userAppData.InsertKey<Guid>(user);
+                Guid id = await _userAppData.InsertKeyAsync<Guid>(user);
 
                 user.UserId = id;
                 return user;
@@ -130,17 +131,17 @@ namespace Services
         /// <param name="user">usuario a modificar</param>
         /// <param name="session">sesion del usuario</param>
         /// <returns>UserApp</returns>
-        public UserApp UserAppUpdate(UserApp user, UserSession session)
+        public async Task<UserApp> UserAppUpdate(UserApp user, UserSession session)
         {
             try
             {
-                if (_userAppData.ExistUserByUserName(user))
+                if (await _userAppData.ExistUserByUserName(user))
                 {
-                    var control = _controlsLanguageData.ControlFindByKey("UserExistForName", 2, session.LanguageId);
+                    var control = await _controlsLanguageData.ControlFindByKey("UserExistForName", 2, session.LanguageId);
                     throw control.CreateException(user.UserName);
                 }
 
-                var oldUser = _userAppData.Get(user.UserId);
+                var oldUser = await _userAppData.GetAsync(user.UserId);
 
                 oldUser.UpdateDate = DateTime.Now;
                 oldUser.UserUpdateId = session.Id;
@@ -150,7 +151,7 @@ namespace Services
                 oldUser.UserFirstName = user.UserFirstName;
                 oldUser.UserLastName = user.UserLastName;
 
-                _userAppData.Update(oldUser);
+                await _userAppData.UpdateAsync(oldUser);
 
                 return oldUser;
             }
@@ -165,11 +166,11 @@ namespace Services
         /// </summary>
         /// <param name="guid">id del usuario</param>
         /// <returns>UserApp</returns>
-        public UserApp UsertFinById(Guid guid)
+        public async Task<UserApp> UsertFinById(Guid guid)
         {
             try
             {
-                var user = _userAppData.Get(guid);
+                var user = await _userAppData.GetAsync(guid);
                 if (user != null)
                     user.UserPw = string.Empty;
 
@@ -231,21 +232,21 @@ namespace Services
         /// </summary>
         /// <param name="document">numero de documento</param>
         /// <returns>UserApp</returns>
-        UserApp UserFindByDocument(string document);
+        Task<UserApp> UserFindByDocument(string document);
 
         /// <summary>
         /// Consulta un usuario en la base de datos por correo electronico
         /// </summary>
         /// <param name="email">correo electronico</param>
         /// <returns>UserApp</returns>
-        UserApp UserFindByEmail(string email);
+        Task<UserApp> UserFindByEmail(string email);
 
         /// <summary>
         /// Consulta un usuario por nombre de usuario
         /// </summary>
         /// <param name="userName">nombre de usuario</param>
         /// <returns>UserApp</returns>
-        UserApp UserFindByUser(string userName);
+        Task<UserApp> UserFindByUser(string userName);
 
         /// <summary>
         /// Inserta un nuevo usuario en la base de datos
@@ -253,7 +254,7 @@ namespace Services
         /// <param name="user">usuario a guardar</param>
         /// <param name="session">sesion del usuario</param>
         /// <returns>UserApp</returns>
-        UserApp UserAppInsert(UserApp user, UserSession session);
+        Task<UserApp> UserAppInsert(UserApp user, UserSession session);
 
         /// <summary>
         /// Actualiza un usuario por id en la base de datos
@@ -261,13 +262,13 @@ namespace Services
         /// <param name="user">usuario a modificar</param>
         /// <param name="session">sesion del usuario</param>
         /// <returns>UserApp</returns>
-        UserApp UserAppUpdate(UserApp user, UserSession session);
+        Task<UserApp> UserAppUpdate(UserApp user, UserSession session);
 
         /// <summary>
         /// Consulta un usuario en la base de datos por id
         /// </summary>
         /// <param name="guid">id del usuario</param>
         /// <returns>UserApp</returns>
-        UserApp UsertFinById(Guid guid);
+        Task<UserApp> UsertFinById(Guid guid);
     }
 }

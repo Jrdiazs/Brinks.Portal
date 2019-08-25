@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Data.Repository
 {
@@ -26,12 +27,13 @@ namespace Data.Repository
         /// <param name="transaction">transaccion sql</param>
         /// <returns>PolicyView</returns>
 
-        public PolicyView PolicyGetGlobal(IDbTransaction transaction = null)
+        public async Task<PolicyView> PolicyGetGlobal(IDbTransaction transaction = null)
         {
             try
             {
-                Guid id = Guid.Empty;
-                return PolicyViewsFind(policyId: id, transaction: transaction).FirstOrDefault();
+                Guid id = Guid.Empty;//Politica global es guid Empty
+                var policy = await PolicyViewsFind(policyId: id, transaction: transaction);
+                return policy.FirstOrDefault();
             }
             catch (Exception)
             {
@@ -45,11 +47,12 @@ namespace Data.Repository
         /// <param name="transaction">transaccion sql</param>
         /// <returns>PolicyView</returns>
 
-        public PolicyView PolicyFindById(Guid id, IDbTransaction transaction = null)
+        public async Task<PolicyView> PolicyFindById(Guid id, IDbTransaction transaction = null)
         {
             try
             {
-                return PolicyViewsFind(policyId: id, transaction: transaction).FirstOrDefault();
+                var policy = await PolicyViewsFind(policyId: id, transaction: transaction);
+                return policy.FirstOrDefault();
             }
             catch (Exception)
             {
@@ -65,15 +68,15 @@ namespace Data.Repository
         /// <param name="thirdTypeId">id tipo tercero</param>
         /// <param name="transaction">transaccion sql server</param>
         /// <returns>List PolicyView</returns>
-        public List<PolicyView> PolicyViewsFind(Guid? policyId = null, Guid? thirdId = null, int? thirdTypeId = null, IDbTransaction transaction = null)
+        public async Task<List<PolicyView>> PolicyViewsFind(Guid? policyId = null, Guid? thirdId = null, int? thirdTypeId = null, IDbTransaction transaction = null)
         {
             try
             {
-                var query = Connections.DBConnection.Query<PolicyView, Third, ThirdType, DocumentType, PolicyView>(sql: "SP_PolicyFind",
+                var query = await Connections.DBConnection.QueryAsync<PolicyView, Third, ThirdType, DocumentType, PolicyView>(sql: "SP_PolicyFind",
                     map: (p, t, tp, d) => { p.Third = t; p.Third.ThirdType = tp; p.Third.Document = d; return p; },
-                    splitOn: "split", transaction: transaction, commandType: CommandType.StoredProcedure).ToList();
+                    splitOn: "split", transaction: transaction, commandType: CommandType.StoredProcedure);
 
-                return query ?? new List<PolicyView>();
+                return query.ToList() ?? new List<PolicyView>();
             }
             catch (Exception)
             {
@@ -95,14 +98,14 @@ namespace Data.Repository
         /// <param name="thirdTypeId">id tipo tercero</param>
         /// <param name="transaction">transaccion sql server</param>
         /// <returns>List PolicyView</returns>
-        List<PolicyView> PolicyViewsFind(Guid? policyId = null, Guid? thirdId = null, int? thirdTypeId = null, IDbTransaction transaction = null);
+        Task<List<PolicyView>> PolicyViewsFind(Guid? policyId = null, Guid? thirdId = null, int? thirdTypeId = null, IDbTransaction transaction = null);
 
         /// <summary>
         /// Obtiene la politica global de la aplicacion para los usuario que no tienen politica y cliente asignado
         /// </summary>
         /// <param name="transaction">transaccion sql</param>
         /// <returns>PolicyView</returns>
-        PolicyView PolicyGetGlobal(IDbTransaction transaction = null);
+        Task<PolicyView> PolicyGetGlobal(IDbTransaction transaction = null);
 
         /// <summary>
         /// Obtiene la politica por id
@@ -110,6 +113,6 @@ namespace Data.Repository
         /// <param name="transaction">transaccion sql</param>
         /// <returns>PolicyView</returns>
 
-        PolicyView PolicyFindById(Guid id, IDbTransaction transaction = null);
+        Task<PolicyView> PolicyFindById(Guid id, IDbTransaction transaction = null);
     }
 }
